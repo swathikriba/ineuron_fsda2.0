@@ -1,0 +1,58 @@
+USE WAREHOUSE NEW_WAREHOUSE;
+USE DATABASE NEW_DATABASE;
+
+CREATE OR REPLACE TABLE SALES_DATA
+            ( ORDER_ID varchar(50) PRIMARY KEY,
+              ORDER_DATE date,
+              SHIP_DATE date,
+              SHIP_MODE CHAR(30),
+              CUSTOMER_NAME VARCHAR(50),
+              SEGEMENT CHAR(20),
+              STATE VARCHAR(50),
+              COUNTRY VARCHAR(50),
+              MARKET CHAR(100),
+              REGION VARCHAR(30),
+              PRODUCT_ID VARCHAR(100),
+              CATEGORY VARCHAR(50),
+              SUB_CATEGORY CHAR(30),
+              PODUCT_NAME VARCHAR(200),
+              SALES VARCHAR(100),
+              QUANTITY VARCHAR(100),
+              DISCOUNT VARCHAR(100),
+              PROFIT VARCHAR(200),
+              SHIPPING_COST VARCHAR(100),
+              ORDER_PRIORITY CHAR(29),
+              YEAR integer );
+DESCRIBE TABLE SALES_DATA;
+SELECT * FROM SALES_DATA;
+
+      
+-- extract the order id right values
+alter table sales_data add order_extract integer;
+update sales_data set order_extract = substr(order_id,9);
+
+               
+-- FLAG ,IF DISCOUNT IS GREATER THEN 0 THEN  YES ELSE NO AND PUT IT IN NEW COLUMN FRO EVERY ORDER ID.
+select *,
+  case 
+      when discount>0 then 'yes'
+  else 'no'
+  end as discount_flag
+ from sales_data;
+ 
+ --FIND OUT HOW MUCH DAYS TAKEN FOR EACH ORDER TO PROCESS FOR THE SHIPMENT FOR EVERY ORDER ID.
+ alter table sales_Data add process_days integer;
+ update sales_data set process_days = datediff('day',order_date,ship_date);
+ 
+/*  FLAG THE PROCESS DAY AS BY RATING IF IT TAKES LESS OR EQUAL 3  DAYS MAKE 5,LESS OR EQUAL THAN 6 DAYS BUT MORE THAN 3 MAKE 4,
+LESS THAN 10 BUT MORE THAN 6 MAKE 3,MORE THAN 10 MAKE IT 2 FOR EVERY ORDER ID.
+*/
+ select *, 
+       case 
+           when process_days <= 3 then '5'
+           when process_days <= 6 and process_days >3 then '4'
+           when process_days <= 10 and process_days >6 then '3'
+       else '2'
+      end as rating from sales_data;
+
+ 
